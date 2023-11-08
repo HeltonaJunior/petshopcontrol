@@ -8,6 +8,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,12 +21,7 @@ public class ClientController {
     @Autowired
     ClientRepository clientRepository;
 
-
-
-    //Cadastro
-    //Login Autenticado
-
-
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/clients")
     public ResponseEntity<ClientModel> saveClient(@RequestBody @Valid ClientRecordDto clientRecordDto){
         var clientModel = new ClientModel();
@@ -33,11 +29,13 @@ public class ClientController {
         return ResponseEntity.status(HttpStatus.CREATED).body(clientRepository.save(clientModel));
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping("/clients")
     public ResponseEntity<List<ClientModel>> getAllClients(){
         return ResponseEntity.status(HttpStatus.OK).body(clientRepository.findAll());
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping("/clients/{cpf}")
     public ResponseEntity<Object> getOneClient(@PathVariable(value="cpf") UUID id){
         Optional<ClientModel> client0 = clientRepository.findById(id);
@@ -46,6 +44,7 @@ public class ClientController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(client0.get());
     }
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/clients/{cpf}")
     public ResponseEntity<Object> updateClient(@PathVariable(value="cpf") UUID id,
                                                 @RequestBody @Valid ClientRecordDto clientRecordDto){
@@ -57,7 +56,7 @@ public class ClientController {
         BeanUtils.copyProperties(clientRecordDto, clientModel);
         return ResponseEntity.status(HttpStatus.OK).body(clientRepository.save(clientModel));
     }
-
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/clients/{cpf}")
     public ResponseEntity<Object> deleteClient(@PathVariable(value="cpf") UUID id){
         Optional<ClientModel> client0 = clientRepository.findById(id);

@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 public record ClientRecordDto(
-        @NotBlank String email,
         @NotBlank String name,
         @NotBlank String cpf,
         @NotBlank String address,
